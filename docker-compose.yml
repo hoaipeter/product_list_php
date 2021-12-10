@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  php-blackpepper:
+    container_name: php-blackpepper-apache
+    image: php:8.0-apache
+    build:
+      context: ./php
+      dockerfile: Dockerfile
+    depends_on:
+        - db
+    volumes:
+        - './php/src:/var/www/html/'
+    ports:
+      - 8010:80
+
+  # Database
+  db:
+    container_name: php-blackpepper-db
+    image: mysql
+    volumes:
+      - './data/mysql:/var/lib/mysql'
+    ports:
+      - 18768:3308
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: someblackpepper
+      MYSQL_DATABASE: blackpepper_db
+      MYSQL_USER: blackpepper_user
+      MYSQL_PASSWORD: blackpepper_password
+
+  # phpmyadmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - '8081:80'
+    restart: always
+    environment:
+      PMA_HOST: db
+    depends_on:
+      - db
